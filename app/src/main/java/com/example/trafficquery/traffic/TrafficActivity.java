@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -37,6 +38,7 @@ public class TrafficActivity extends AppCompatActivity {
     private Spinner spinner_traffic;
     private List<String> list = new ArrayList<>();
     private ArrayAdapter<String> adapter_spinner;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +53,8 @@ public class TrafficActivity extends AppCompatActivity {
         list.add("京");
         list.add("辽");
         spinner_traffic.setAdapter(adapter_spinner);
+        editor = getSharedPreferences("data",0).edit();
 
-        
         find_traffic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,9 +63,10 @@ public class TrafficActivity extends AppCompatActivity {
                 }else {
                     String engine = engineNumber_traffic.getText().toString();
                     String number = list.get(spinner_traffic.getSelectedItemPosition())+number_traffic.getText().toString();
+                    editor.putString("engine",engine);
+                    editor.putString("number",number);
+                    editor.commit();
                     Intent intent = new Intent(TrafficActivity.this,TrafficListActivity.class);
-                    intent.putExtra("engine",engine);
-                    intent.putExtra("number",number);
                     startActivity(intent);
                 }
             }

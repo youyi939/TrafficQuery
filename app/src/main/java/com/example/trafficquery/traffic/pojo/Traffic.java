@@ -1,6 +1,8 @@
 package com.example.trafficquery.traffic.pojo;
 
-public class Traffic {
+import java.io.Serializable;
+
+public class Traffic implements Serializable {
     private int id ;
     private String licencePlate ;            //车牌号
     private String disposeState;             //处理状态

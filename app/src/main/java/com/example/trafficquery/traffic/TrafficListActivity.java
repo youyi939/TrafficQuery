@@ -4,11 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -35,6 +37,7 @@ public class TrafficListActivity extends AppCompatActivity {
     private TrafficAdapter adapter;
     private Button findAll_traffic;
     private LinearLayout linearLayout;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,28 +46,51 @@ public class TrafficListActivity extends AppCompatActivity {
         listView_traffic = findViewById(R.id.listView_traffic);
         findAll_traffic = findViewById(R.id.findAll_traffic);
         linearLayout = findViewById(R.id.linnerlayout_traffic);
-
-
-        Intent intent = getIntent();
-        if (intent.getStringExtra("engine") != null){
-            String engine = intent.getStringExtra("engine");
-            String number = intent.getStringExtra("number");
-            getTrafficList(engine,number);
-        }
+        sharedPreferences = getSharedPreferences("data",0);
 
         findAll_traffic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 adapter = new TrafficAdapter(TrafficListActivity.this,R.layout.traffic_item,trafficList);
                 listView_traffic.setAdapter(adapter);
-                            linearLayout.removeView(findAll_traffic);
+                linearLayout.removeView(findAll_traffic);
+                Log.i("Ken", "onClick: "+trafficList.size());
             }
         });
 
+        listView_traffic.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent1 =new Intent(TrafficListActivity.this,TrafficInfoActivity.class);
+                intent1.putExtra("traffic",trafficList.get(i));
+                startActivity(intent1);
+            }
+        });
 
     }
 
-    public void getTrafficList(String engine,String number){
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+            String engine = sharedPreferences.getString("engine","engine");
+            String number = sharedPreferences.getString("number","number");
+            getTrafficList(engine,number);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("Ken", "onPause: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("Ken", "onResume: ");
+    }
+
+    public void getTrafficList(String engine, String number){
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -107,7 +133,7 @@ public class TrafficListActivity extends AppCompatActivity {
             switch (msg.what){
                 case 1:
                     if (trafficList.size() > 5){
-                        trafficList2 = trafficList.subList(0,trafficList.size()/2);
+                        trafficList2 = trafficList.subList(0,5);
                         adapter = new TrafficAdapter(TrafficListActivity.this,R.layout.traffic_item,trafficList2);
                         listView_traffic.setAdapter(adapter);
                     }else {
