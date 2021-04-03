@@ -43,7 +43,6 @@ public class TrafficAdapter extends ArrayAdapter<Traffic> {
             disposeState.setText("处理状态:"+"未处理");
         }
 
-
         badTime_traffic.setText("违章时间"+traffic.getBadTime());
         illegalSites_traffic.setText("违章地点"+traffic.getIllegalSites());
 

@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.example.trafficquery.R;
@@ -27,20 +30,36 @@ public class TrafficListActivity extends AppCompatActivity {
 
 
     private List<Traffic> trafficList = new ArrayList<>();
+    private List<Traffic> trafficList2 = new ArrayList<>();
     private ListView listView_traffic;
     private TrafficAdapter adapter;
+    private Button findAll_traffic;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_traffic_list);
         listView_traffic = findViewById(R.id.listView_traffic);
+        findAll_traffic = findViewById(R.id.findAll_traffic);
+        linearLayout = findViewById(R.id.linnerlayout_traffic);
+
+
         Intent intent = getIntent();
         if (intent.getStringExtra("engine") != null){
             String engine = intent.getStringExtra("engine");
             String number = intent.getStringExtra("number");
             getTrafficList(engine,number);
         }
+
+        findAll_traffic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                adapter = new TrafficAdapter(TrafficListActivity.this,R.layout.traffic_item,trafficList);
+                listView_traffic.setAdapter(adapter);
+                            linearLayout.removeView(findAll_traffic);
+            }
+        });
 
 
     }
@@ -87,8 +106,14 @@ public class TrafficListActivity extends AppCompatActivity {
         public void handleMessage(@NonNull Message msg) {
             switch (msg.what){
                 case 1:
-                    adapter = new TrafficAdapter(TrafficListActivity.this,R.layout.traffic_item,trafficList);
-                    listView_traffic.setAdapter(adapter);
+                    if (trafficList.size() > 5){
+                        trafficList2 = trafficList.subList(0,trafficList.size()/2);
+                        adapter = new TrafficAdapter(TrafficListActivity.this,R.layout.traffic_item,trafficList2);
+                        listView_traffic.setAdapter(adapter);
+                    }else {
+                        adapter = new TrafficAdapter(TrafficListActivity.this,R.layout.traffic_item,trafficList);
+                        listView_traffic.setAdapter(adapter);
+                    }
                     break;
                 default:
                     break;
